@@ -44,7 +44,7 @@ class Store
 
     public void AddItem(Item item)
     {
-        if (items.Count >= maxCapacity)
+        if (GetCurrentVolume()+item.quantity>maxCapacity)
         {
             Console.WriteLine("Cannot add item. Store is at maximum capacity.");
             return;
@@ -127,7 +127,7 @@ public class MyProgram
         var umbrella = new Item("Umbrella", 5);
         var sunscreen = new Item("Sunscreen", 8);
 
-        var store = new Store(10);
+        var store = new Store(100);
 
         store.AddItem(waterBottle);
         store.AddItem(chocolateBar);
