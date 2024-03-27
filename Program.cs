@@ -12,7 +12,11 @@ class Item
         set { Quantity = value; }
         get { return Quantity; }
     }
-    private DateTime CreateTime { set; get; }
+    private DateTime CreateTime;
+    public DateTime createTime
+    {
+        set; get;
+    }
 
     public Item(string name, int quantity, DateTime createTime = default)
     {
@@ -40,11 +44,16 @@ class Store
     {
         maxCapacity = capacity;
     }
+    public enum Order
+    {
+        ASC,
+        DESC
+    }
 
 
     public void AddItem(Item item)
     {
-        if (GetCurrentVolume()+item.quantity>maxCapacity)
+        if (GetCurrentVolume() + item.quantity > maxCapacity)
         {
             Console.WriteLine("Cannot add item. Store is at maximum capacity.");
             return;
@@ -60,9 +69,9 @@ class Store
         }
     }
 
-    public Item FindItemByName(string name)
+    public Item? FindItemByName(string name)
     {
-        Item findItem = items.FirstOrDefault(item => item.NameGet == name);
+        Item? findItem = items.FirstOrDefault(item => item.NameGet == name);
         if (findItem == null)
         {
             Console.WriteLine("There is no item with the given name");
@@ -72,7 +81,7 @@ class Store
 
     public void DeleteItem(string name)
     {
-        Item findItem = items.FirstOrDefault(item => item.NameGet == name);
+        Item? findItem = items.FirstOrDefault(item => item.NameGet == name);
         if (findItem != null)
         {
             items.Remove(findItem);
@@ -82,6 +91,20 @@ class Store
         {
 
             Console.WriteLine("There is no item with the given name");
+        }
+    }
+
+    public IEnumerable<Item> SortByDate(Order OrderChoice)
+    {
+        if (OrderChoice == Order.ASC)
+        {
+            return items.OrderBy(item => item.createTime);
+
+
+        }
+        else
+        {
+            return items.OrderByDescending(item => item.createTime);
         }
     }
 
@@ -95,13 +118,15 @@ class Store
         return items.OrderBy(item => item.NameGet).ToList();
     }
 
-    public void AllList()
+    public  void AllList()
     {
         foreach (var item in items)
         {
             Console.WriteLine(item);
         }
     }
+
+    
 }
 
 public class MyProgram
@@ -142,7 +167,7 @@ public class MyProgram
         store.AddItem(coffee);
         store.AddItem(sandwich);
         store.AddItem(batteries);
-
+       
         Console.WriteLine($"Current volume: {store.GetCurrentVolume()}");
 
         store.FindItemByName("Chocolate Bar");
@@ -156,6 +181,12 @@ public class MyProgram
         foreach (var item in sortedItems)
         {
             Console.WriteLine(item);
-        }
+        } 
+        var collectionSortedByDate = store.SortByDate(Store.Order.ASC);
+        Console.WriteLine("______________________________________________________");
+        Console.WriteLine("items after order it by date: ");
+        foreach (var item in collectionSortedByDate) {
+            Console.WriteLine($"{item}");
+         }
     }
 }
