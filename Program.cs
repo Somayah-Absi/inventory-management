@@ -4,18 +4,19 @@ using System.Linq;
 
 class Item
 {
-    private string Name;
-    public string NameGet { get { return Name; } }
-    private int Quantity;
-    public int quantity
+    private string name;
+    public string Name { set { name = value; } get { return name; } }
+    private int quantity;
+    public int Quantity
     {
-        set { Quantity = value; }
-        get { return Quantity; }
+        set { quantity = value; }
+        get { return quantity; }
     }
-
+    private DateTime createTime;
     public DateTime CreateTime
     {
-        private set; get;
+        private set { createTime = value; }
+        get { return createTime; }
     }
 
     public Item(string name, int quantity, DateTime createTime = default)
@@ -25,7 +26,8 @@ class Item
             Quantity = quantity;
         }
         else { Console.WriteLine("The amount cannot be negative"); }
-        Name = name;
+
+        this.name = name;
         CreateTime = createTime == default ? DateTime.Now : createTime;
 
 
@@ -55,12 +57,12 @@ class Store
 
     public void AddItem(Item item)
     {
-        if (GetCurrentVolume() + item.quantity > maxCapacity)
+        if (GetCurrentVolume() + item.Quantity > maxCapacity)
         {
             Console.WriteLine("Cannot add item. Store is at maximum capacity.");
             return;
         }
-        bool isExist = items.Any(check => check.NameGet == item.NameGet);
+        bool isExist = items.Any(check => check.Name == item.Name);
         if (isExist)
         {
             Console.WriteLine("The item already exists");
@@ -80,16 +82,51 @@ class Store
 
         return groupedItems;
     }
+    public Item? FindItemByName(string name)
+    {
+        Item? findItem = items.FirstOrDefault(item => item.Name == name);
+        if (findItem == null)
+        {
+            Console.WriteLine("There is no item with the given name");
+        }
+        return findItem;
+    }
+    public void DeleteItem(string name)
+    {
+        Item? findItem = items.FirstOrDefault(item => item.Name == name);
+        if (findItem != null)
+        {
+            items.Remove(findItem);
+            Console.WriteLine("Item removed successfully");
+        }
+        else
+        {
+            Console.WriteLine("There is no item with the given name");
+        }
+    }
+    public IEnumerable<Item> SortByDate(Order OrderChoice)
+    {
+        if (OrderChoice == Order.ASC)
+        {
+            return items.OrderBy(item => item.CreateTime);
+
+
+        }
+        else
+        {
+            return items.OrderByDescending(item => item.CreateTime);
+        }
+    }
 
 
     public int GetCurrentVolume()
     {
-        return items.Sum(item => item.quantity);
+        return items.Sum(item => item.Quantity);
     }
 
     public List<Item> SortByNameAsc()
     {
-        return items.OrderBy(item => item.NameGet).ToList();
+        return items.OrderBy(item => item.Name).ToList();
     }
 
     public void AllList()
@@ -127,7 +164,7 @@ public class MyProgram
         var batteries = new Item("Batteries", 10);
         var umbrella = new Item("Umbrella", 5);
         var sunscreen = new Item("Sunscreen", 8);
-        Item newItem = new Item("New Item", 10);
+
 
         var store = new Store(300);
 
@@ -144,37 +181,41 @@ public class MyProgram
         store.AddItem(coffee);
         store.AddItem(sandwich);
         store.AddItem(batteries);
-        store.AddItem(newItem);
-        store.AllList();
+        store.AddItem(umbrella);
+        store.AddItem(sunscreen);
+
 
         Console.WriteLine($"Current volume: {store.GetCurrentVolume()}");
 
-        // store.FindItemByName("Chocolate Bar");
-        // store.FindItemByName("Batteries");
+        store.FindItemByName("Chocolate Bar");
+        store.FindItemByName("Batteries");
 
-        // store.DeleteItem("Chocolate Bar");
-        // Console.WriteLine($"Current volume after deletion: {store.GetCurrentVolume()}");
+        store.DeleteItem("Chocolate Bar");
+        Console.WriteLine($"Current volume after deletion: {store.GetCurrentVolume()}");
 
-        // List<Item> sortedItems = store.SortByNameAsc();
-        // Console.WriteLine("_________________________________________________");
-        // foreach (var item in sortedItems)
-        // {
-        //     Console.WriteLine(item);
-        // }
-        // var collectionSortedByDate = store.SortByDate(Store.Order.ASC);
-        // Console.WriteLine("______________________________________________________");
-        // Console.WriteLine("items after order it by date: ");
-        // foreach (var item in collectionSortedByDate)
-        // {
-        //     Console.WriteLine($"{item}");
-        // }
+        List<Item> sortedItems = store.SortByNameAsc();
+        Console.WriteLine("_________________________________________________");
+        Console.WriteLine("items after sorting by name: \n ");
+        foreach (var item in sortedItems)
+        {
+            Console.WriteLine(item);
+        }
+        var collectionSortedByDate = store.SortByDate(Store.Order.DESC);
+        Console.WriteLine("______________________________________________________");
+        Console.WriteLine("items after order it by date:\n ");
+        foreach (var item in collectionSortedByDate)
+        {
+            Console.WriteLine($"{item}");
+        }
+        Console.WriteLine("______________________________________________________");
+        Console.WriteLine("items organized depend on date: \n");
         var groupByDate = store.GroupByDate();
         foreach (var group in groupByDate)
         {
             Console.WriteLine($"{group.Key} Items:");
             foreach (var item in group.Value)
             {
-                Console.WriteLine($" - {item.NameGet}, Created: {item.CreateTime.ToShortDateString()}");
+                Console.WriteLine($" - {item.Name}, Created: {item.CreateTime.ToShortDateString()}");
             }
         }
     }
