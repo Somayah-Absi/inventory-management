@@ -87,9 +87,14 @@ class Store
         Item? findItem = items.FirstOrDefault(item => item.Name == name);
         if (findItem == null)
         {
-            Console.WriteLine("There is no item with the given name");
+            throw new KeyNotFoundException($"Item '{name}' not found.");
         }
-        return findItem;
+        else
+        {
+            Console.WriteLine($"Item found: '{name}'");
+            return findItem;
+        }
+
     }
     public void DeleteItem(string name)
     {
@@ -97,7 +102,7 @@ class Store
         if (findItem != null)
         {
             items.Remove(findItem);
-            Console.WriteLine("Item removed successfully");
+            Console.WriteLine($"Item '{name}' removed successfully");
         }
         else
         {
@@ -183,7 +188,10 @@ public class MyProgram
         store.AddItem(batteries);
         store.AddItem(umbrella);
         store.AddItem(sunscreen);
-
+        Console.WriteLine("----------------------------------------------");
+        Console.WriteLine("original items list:  \n");
+        store.AllList();
+        Console.WriteLine("----------------------------------------------\n");
 
         Console.WriteLine($"Current volume: {store.GetCurrentVolume()}");
 
